@@ -13,7 +13,7 @@ An extension to change the UI font of vscode. That's all it does.
 
 ## Usage
 
-After installation, run the `Fonted: Enable` command (from the command pallette). Then restart.
+After installation, provide the setting: `"fonted.font": "Pragmata Pro Mono"`,  run the `Fonted: Enable` command (from the command pallette). Then restart.
 
 Ignore the notification: "Your Code installation appears to be corrupt. Please reinstall."
 

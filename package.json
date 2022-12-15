@@ -2,7 +2,7 @@
   "name": "fonted",
   "displayName": "fonted",
   "description": "Change UI font for vscode. Just that.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "degreat",
   "repository": "https://github.com/blackmann/fonted.git",
   "engines": {
