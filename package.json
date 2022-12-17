@@ -2,7 +2,7 @@
   "name": "fonted",
   "displayName": "fonted",
   "description": "Change UI font for vscode. Just that.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "degreat",
   "repository": "https://github.com/blackmann/fonted.git",
   "engines": {
@@ -40,7 +40,7 @@
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",
-    "compile": "tsc -p ./",
+    "compile": "node ./bundle.js",
     "watch": "tsc -watch -p ./",
     "pretest": "yarn run compile && yarn run lint",
     "lint": "eslint src --ext ts",
@@ -55,6 +55,7 @@
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "@vscode/test-electron": "^2.2.0",
+    "esbuild": "^0.16.8",
     "eslint": "^8.28.0",
     "glob": "^8.0.3",
     "mocha": "^10.1.0",
