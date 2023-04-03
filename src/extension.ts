@@ -1,21 +1,20 @@
 // The module 'vscode' contains the VS Code extensibility API
 import * as fs from 'fs'
-import * as jsdom from 'jsdom'
 import * as path from 'path'
 import * as vscode from 'vscode'
 
 export function activate(context: vscode.ExtensionContext) {
   let enable = vscode.commands.registerCommand('fonted.enable', () => {
-  	setFont(context)
-  });
+    setFont(context)
+  })
 
-  context.subscriptions.push(enable);
+  context.subscriptions.push(enable)
 
   let disable = vscode.commands.registerCommand('fonted.disable', () => {
-  	deactivate()
-  });
+    unsetFont()
+  })
 
-  context.subscriptions.push(disable);
+  context.subscriptions.push(disable)
 }
 
 export function deactivate() {
@@ -37,60 +36,52 @@ function getWorkbenchHtml() {
   return html
 }
 
+function getStyleMarkup() {
+  const font = getFont()
+
+  return `<style>
+  .mac, .windows, .linux {font-family: "${font}" !important;}
+  </style>`
+}
+
 function setFont(context: vscode.ExtensionContext) {
   const font = getFont()
+
   if (!font) {
     unsetFont()
     return
   }
 
   const html = getWorkbenchHtml()
-  const styleDefinition = getStyleDefinition()
+  const styleMarkup = getStyleMarkup()
 
-  if (html.includes(styleDefinition)) {
+  if (html.includes(styleMarkup)) {
     return
   }
 
-  const dom = new jsdom.JSDOM(html)
-	const window = dom.window
-	const document = window.document
+  const newHtml = html.replace('</head>', styleMarkup + '</head>')
 
-  const style = document.createElement('style')
-  style.id = 'fonted'
-  style.appendChild(document.createTextNode(styleDefinition))
-
-  document.getElementsByTagName('head')[0].appendChild(style)
-
-  save(window)
+  save(newHtml)
   promptRestart()
 }
 
 function unsetFont() {
-  const dom = new jsdom.JSDOM(getWorkbenchHtml())
-  const window = dom.window
+  const html = getWorkbenchHtml()
 
-  const style = window.document.querySelector('style#fonted')
-  if (!style) {
+  const styleMarkup = getStyleMarkup()
+  if (!html.includes(styleMarkup)) {
     return
   }
 
-  style.remove()
+  const newHtml = html.replace(styleMarkup, '')
 
-  save(window)
+  save(newHtml)
   promptRestart()
 }
 
-function save(window: jsdom.DOMWindow) {
-  const xmlSerializer = new window.XMLSerializer()
-
+function save(html: string) {
   const workbenchPath = getWorkbenchPath()
-  const document = window.document
-  fs.writeFileSync(workbenchPath, xmlSerializer.serializeToString(document))
-}
-
-function getStyleDefinition() {
-  const font = getFont()
-  return `.mac, .windows, .linux {font-family: "${font}" !important;}`
+  fs.writeFileSync(workbenchPath, html)
 }
 
 function getFont() {
