@@ -2,7 +2,8 @@
 
 An extension to change the UI font of vscode. That's all it does.
 
-<td><img src="assets/dark.png" alt="dark" /></td>
+
+<img src="assets/dark.png" alt="dark" />
 
 ## Usage
 
