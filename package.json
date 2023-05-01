@@ -2,7 +2,7 @@
   "name": "fonted",
   "displayName": "fonted",
   "description": "Change UI font for vscode. Just that.",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "publisher": "degreat",
   "icon": "assets/fonted.png",
   "repository": "https://github.com/blackmann/fonted.git",
@@ -15,6 +15,9 @@
   "activationEvents": [
     "onCommand:fonted.helloWorld",
     "onStartupFinished"
+  ],
+  "extensionKind": [
+    "ui"
   ],
   "main": "./out/extension.js",
   "contributes": {
