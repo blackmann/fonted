@@ -3,48 +3,61 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as vscode from 'vscode'
 
+type Pattern = {
+  pattern: RegExp,
+  file: string
+}
+
+const WORKBENCH_DESKTOP_MAIN_JS = 'workbench.desktop.main.js'
+const WORKBENCH_DESKTOP_MAIN_CSS = 'workbench.desktop.main.css'
+
+const FONTED_STUB_PATTERN = /(\/\* fonted:start \*\/\')([a-zA-Z0-9- ]+)(\',\/\* fonted:end \*\/)/g
+
+function addStabsToFont(font: string) {
+  return `/* fonted:start */'${font}',/* fonted:end */`
+}
+
+const JS_PATTERN: Pattern = {
+  pattern: /(:host-context\(\.(windows|linux|mac)\)[ ]{0,}\{[ ]{0,}font-family:)/g,
+  file: WORKBENCH_DESKTOP_MAIN_JS
+}
+
+const CSS_PATTERN: Pattern = {
+  pattern: /(.(windows|linux|mac)[ ]{0,}\{[ ]{0,}font-family:)/g,
+  file: WORKBENCH_DESKTOP_MAIN_CSS
+}
+
+const PATTERNS = [JS_PATTERN, CSS_PATTERN]
+
 export function activate(context: vscode.ExtensionContext) {
   let enable = vscode.commands.registerCommand('fonted.enable', () => {
-    setFont(context)
+    setFont()
+    promptRestart()
   })
 
   context.subscriptions.push(enable)
 
   let disable = vscode.commands.registerCommand('fonted.disable', () => {
     unsetFont()
+    promptRestart()
   })
 
   context.subscriptions.push(disable)
 }
 
 export function deactivate() {
-
+  unsetFont()
+  promptRestart()
 }
 
 function getWorkbenchPath() {
   const basePath = path.dirname(require.main!.filename)
-  const workbenchRelativePath =
-    '/vs/code/electron-sandbox/workbench/workbench.html'
-  const workbenchPath = [basePath, workbenchRelativePath].join('')
-
+  const workbenchRelativePath = '/vs/workbench'
+  const workbenchPath = path.join(basePath, workbenchRelativePath)
   return workbenchPath
 }
 
-function getWorkbenchHtml() {
-  const workbenchPath = getWorkbenchPath()
-  const html = fs.readFileSync(workbenchPath, 'utf8')
-  return html
-}
-
-function getStyleMarkup() {
-  const font = getFont()
-
-  return `<style>
-  .mac, .windows, .linux {font-family: "${font}" !important;}
-  </style>`
-}
-
-function setFont(context: vscode.ExtensionContext) {
+function setFont() {
   const font = getFont()
 
   if (!font) {
@@ -52,40 +65,48 @@ function setFont(context: vscode.ExtensionContext) {
     return
   }
 
-  const html = getWorkbenchHtml()
-  const styleMarkup = getStyleMarkup()
+  
+  for (const { pattern, file } of PATTERNS) {
+    const workbenchPath = getWorkbenchPath()
+    const workbenchContentPath = path.join(
+      workbenchPath,
+      file
+    )
+    let content = fs.readFileSync(workbenchContentPath, 'utf8')
 
-  if (html.includes(styleMarkup)) {
-    return
+    if (FONTED_STUB_PATTERN.test(content)) {
+      content = content.replaceAll(FONTED_STUB_PATTERN, `$1${font}$3`)
+    } else {
+      content = content.replaceAll(pattern, `$1${addStabsToFont(font)}`)
+    }
+
+    fs.writeFileSync(
+      workbenchContentPath,
+      content
+    )
   }
-
-  const newHtml = html.replace('</head>', styleMarkup + '</head>')
-
-  save(newHtml)
-  promptRestart()
 }
 
 function unsetFont() {
-  const html = getWorkbenchHtml()
+  for (const { file } of PATTERNS) {
+    const workbenchPath = getWorkbenchPath()
+    const workbenchContentPath = path.join(
+      workbenchPath,
+      file
+    )
+    let content = fs.readFileSync(workbenchContentPath, 'utf8')
 
-  const styleMarkup = getStyleMarkup()
-  if (!html.includes(styleMarkup)) {
-    return
+    content = content.replaceAll(FONTED_STUB_PATTERN, '')
+
+    fs.writeFileSync(
+      workbenchContentPath,
+      content
+    )
   }
-
-  const newHtml = html.replace(styleMarkup, '')
-
-  save(newHtml)
-  promptRestart()
-}
-
-function save(html: string) {
-  const workbenchPath = getWorkbenchPath()
-  fs.writeFileSync(workbenchPath, html)
 }
 
 function getFont() {
-  return vscode.workspace.getConfiguration().get('fonted.font')
+  return vscode.workspace.getConfiguration().get<string>('fonted.font')
 }
 
 // Copied from https://github.dev/iocave/monkey-patch/blob/b75dd36951132aae10b898a345cda489f0a5e3d6/src/extension.ts#L188
