@@ -23,7 +23,7 @@ export function deactivate() {}
 
 function getWorkbenchPath() {
 	const workbenchRelativePath =
-		"out/vs/code/electron-sandbox/workbench/workbench.esm.html";
+		"out/vs/code/electron-sandbox/workbench/workbench.html";
 	const workbenchPath = path.join(vscode.env.appRoot, workbenchRelativePath);
 
 	console.log("workbenchPath", workbenchPath);
