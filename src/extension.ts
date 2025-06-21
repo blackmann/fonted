@@ -22,9 +22,15 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {}
 
 function getWorkbenchPath() {
-	const workbenchRelativePath =
-		"out/vs/code/electron-sandbox/workbench/workbench.html";
-	const workbenchPath = path.join(vscode.env.appRoot, workbenchRelativePath);
+	const workbenchRelativePathOld = "out/vs/code/electron-sandbox/workbench/workbench.html";
+	const workbenchRelativePathNew = "out/vs/code/electron-browser/workbench/workbench.html";
+
+	let workbenchPath = path.join(vscode.env.appRoot, workbenchRelativePathOld);
+
+    if (!fs.existsSync(workbenchPath))
+    {
+        workbenchPath = path.join(vscode.env.appRoot, workbenchRelativePathNew);
+    }    
 
 	console.log("workbenchPath", workbenchPath);
 
