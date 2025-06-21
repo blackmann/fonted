@@ -4,6 +4,10 @@ All notable changes to the "fonted" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [1.2.0] - 2025-06-21
+
+Anticipate workbench director change.
+
 ## [1.1.0] - 2024-10-30
 
 Change back to `workbench.html`. At this point vscode is just playing hide and seek.
