@@ -3,7 +3,7 @@
 An extension to change the UI font of vscode. That's all it does.
 
 > [!IMPORTANT]
-> For Cursor (and some other vs clone forks), the marketplace doesn't stay up to date with the current version of Fonted. Please use the [Releases](https://github.com/blackmann/fonted/releases) page.
+> For Cursor (and some other VS Code forks), the marketplace doesn't stay up to date with the current version of Fonted. Please use the [Releases](https://github.com/blackmann/fonted/releases) page.
 
 
 <img src="assets/dark.png" alt="dark" />
